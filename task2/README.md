@@ -1,4 +1,4 @@
-I also wanted to mention that I am not as familiar with MySQL as I wanted to be. Also, this is the first time when I see such an alert. However, I'll do my best to solve this one. 
+Note: I have basic experience working with MySQL (mostly non-administration, like working with database tables). Never had a chance to work with Prometeus so the conclusion is based solely off the warning message information.
 
 ```sh
   - alert: MysqlTransactionDeadlock

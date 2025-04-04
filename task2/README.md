@@ -1,4 +1,4 @@
-Note: I have basic experience working with MySQL (mostly non-administration, like working with database tables). Never had a chance to work with Prometeus so the conclusion is based solely off the warning message information.
+Note: I have basic experience working with MySQL (mostly non-administration, like working with database tables). Never had a chance to work with Prometheus so the conclusion is based solely off the warning message information and [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
 
 ```sh
   - alert: MysqlTransactionDeadlock
@@ -16,15 +16,16 @@ Note: I have basic experience working with MySQL (mostly non-administration, lik
 
 | Line                                                                                       | Explanation                                                                                                                                                                                                                                  |
 |--------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| MysqlTransactionDeadlock                                                                   | most probably indicates the fact that MySQL has encountered a deadlock in a transaction. This could happen when two or more transactions are waiting for each other to release lock on resources, which causes a loop when none can proceed. |
+| alert:                                                                                     | The name of the alert. Must be a valid label value. |
+| MysqlTransactionDeadlock  | type of alert about MySQL encountering a deadlock during transaction execution. Commonly happens when two or more transactions are waiting for each other to release lock on resources, which causes a loop when none can proceed. |
 | expr: increase(mysql_global_status_innodb_row_lock_waits[2m]) > 0                          | this must be the event circumstances which trigger the alert. If I understand it correctly, it means that innodb row lock waits has increased in the last 2 minutes and the nuber of blocked transactions is greater than 0.                 |
-| for: 3m                                                                                    | most pobably, means that the event happened at least 3 minutes ago and it's time to trigger the alert                                                                                                                                        |
+| for: 3m                                                                                    | alerts are considered firing once they have been returned for this long. Alerts which have not yet fired for long enough are considered pending.                                                                           |
 | labels:                                                                                    | some keywords or key-phrases usually assigned here to organize the alerts                                                                                                                                                                    |
 | severity: warning                                                                          | specifies the severity of the issue (alert), this one is not critical, only warning.                                                                                                                                                         |
 | annotations:                                                                               | readable context shown in dashboards and alerts |
 | dashboard: database-metrics                                                                | should refer to the name or ID of the related Grafana dashboard |
 | summary: 'Mysql Transaction Waits'                                                         | a title used for notifications or alerts |
-| description: 'There are `{{ $value | humanize }}` MySQL connections waiting for a stale transaction to release.' | provides humanized description of the issue with an additional data to help uderstand the issue quickly |
+| description: 'There are `{{ $value / humanize }}` MySQL connections waiting for a stale transaction to release.' | provides humanized description of the issue with an additional data to help uderstand the issue quickly (changed to / intentionally to not mess with the git table structure) |
 
 Possible causes of the issue: 
 1. Two or more transactions are modifying the same rows and waiting for each other to finish
@@ -56,6 +57,3 @@ description: 'There are {{ $value | humanize }} MySQL transactions waiting due t
    expr: increase(mysql_global_status_innodb_row_lock_waits[5m]) > 5
 for: 5m
 ```
-
-
-Disclaimer: to be honest, I used some ChatGPT to help me understand what it's all about and make it in time. However, it allowed me to quickly adapt to the situation and provide a solution to the case which I never encountered before. I guess, such situations should be pretty common for everyone on new position and ability to learn quickly while providing sustainable solutions can't be considered as a con. 
